@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>CSE6242 HW1, Q4: D3 Test</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+        <style type="text/css">
+        	div.bar {
+        		display: inline-block;
+        		width: 20px;
+        		height: 75px;
+        		background-color:maroon;
+        	}
+        	h3 {
+        		color:green;
+        	}
+        </style>
+    </head>
+    <body>
+    	<h3>Robert Chen</h3>
+    	<br>
+        <script type="text/javascript">
+        	//d3.select("body")
+        	//	.append("p")
+        	//	.text("New Paragraph!");
+
+  			var dataset = [ 5, 10, 15, 20, 25 ];
+
+			//bar div
+			d3.select("body").selectAll("div")
+				.data(dataset)
+				.enter()
+				.append("div")
+				.attr("class", "bar")
+				.style("height", function(d) { // this style overrides what is in the CSS for the div(see line 7-12)
+					var barHeight = d * 5; //scale up by factor of 5
+					return barHeight + "px";
+				})
+				.style("margin-right", function(d) {
+					return "2px"; //add 2px margin to right of each bar
+				})
+				;
+
+
+
+  		// 	d3.select("body").selectAll("p") //Selects all paragraphs in the DOM. Since none exist yet, this returns an empty selection. Think of this empty selection as representing the paragraphs that will soon exist.
+  		// 		.data(dataset) //Counts and parses our data values. There are five values in our data set, so everything past this point is executed five times, once for each value.
+  		// 		.enter() //creates a new placeholder element on which you may work your magic. It then hands off a reference to this new placeholder to the next step in the chain.
+  		// 		.append("p") //Takes the placeholder selection created by enter() and inserts a p element into the DOM. Hooray! Then it hands off a reference to the element it just created to the next step in the chain.
+  		// 		.text( function(d)
+  		// 				{ return "I can count up to: " + d; }
+  		// 		)//You may be wondering why you have to write out function(d)... instead of just d on its own. For example, this won’t work:
+				// 			//.text("I can count up to " + d);
+				// 		//In this context, without wrapping d in an anonymous function, d has no value. Think of d as a lonely little placeholder value that just needs a warm, containing hug from a kind, caring function’s parantheses. (Extending this metaphor further, yes, it is creepy that the hug is being given by an anonymous function — stranger danger! — but that only confuses matters.)
+				// .style("color", 
+				// 	function(d) {
+				// 		if (d>15) { //Threshold of 15
+				// 			return "red";
+				// 		} else{
+				// 			return "black";
+				// 		}
+				// 	} 
+				// );
+        </script>
+
+
+
+        <!--
+        <script>
+        	var dataset = [ 5, 10, 15, 20, 25 ];
+			d3.select("body").selectAll("div")
+				.data(dataset)
+				.enter()
+				.append("div")
+				.attr("class", "bar");
+        </script> -->
+
+        <!-- can also write the above script like this (more legible if more functions are called and you dont want to chain):
+		
+		<script type="text/javascript">
+      	var body = d3.select("body");
+		var p = body.append("p");
+		p.text("New paragraph!");
+		</script>
+		-->
+
+        
+
+		
+    </body>
+</html>  

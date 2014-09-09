@@ -1,0 +1,4 @@
+this graph where I ranked the nodes by DEGREE.
+Color scheme ranging from where blue is lowest degree (4) and red is highest degree (31). 
+Filtered out all nodes where degree was 3 or less.
+Layout used was YifanHu's Multilevel. 
