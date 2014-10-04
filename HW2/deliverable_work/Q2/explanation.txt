@@ -1,0 +1,5 @@
+Q2.2: Columns are grouped by sections: cost, car type, AWD/RWD, MPG, other specs; checkmark icons for binary variables; heat map for continuous variables.
+
+Q2.3: Part a: MPG was plotted in two "groups" for city and highway, and each car was a different colored bar. This allows us to separate the criteria easily. Horse power, engine size and price are on different charts because they use different scales. Part b: Plotted City and Highway on separate charts so that you can compare different cars easier. 
+
+Q2.4: We cluster nodes based on the manufacturer. This makes the data easier to interpret. We also vary the size of the node based upon metrics like MPG.

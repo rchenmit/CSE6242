@@ -1,0 +1,5 @@
+Q1.3: I think linear works better because the square root way will make the nodes too small to see. We don't have coolness factors that differ by orders of magnitude, the difference is smaller.
+
+Q1.4: This visualization is better because it leaves the important characters. We simply have too many nodes in the original graph that it is too hard to interpret.
+
+Q1.7: We made the text bigger in this one, and also made the text blue. Also when you hover over a node, the text is a different color. We also changed the charge of the force to spread out the nodes on the visualization.

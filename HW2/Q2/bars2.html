@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+
+<head>
+<title>Cars comparison</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+<style>
+
+svg {
+  background: #ddd;
+  font: 10px sans-serif;
+}
+</style>
+
+<style>
+	.axis path, .axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+
+	.axis path {
+		fill: none;
+		stroke: none;
+	}
+
+	.bar {
+		fill: steelblue;
+		stroke: white;
+	}
+
+	#bar1, #bar2 {float: left;margin-left:10px;}
+</style>
+</head>
+
+<body>
+
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="d3/d3.min.js"></script>
+
+<!-- data for the 5 sportscars that will be presented -->
+<script type="text/javascript">
+var data_from_json = [
+	{
+	"Vehicle Name":"Porsche 911 Carrera 4S coupe 2dr (convert)",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":1,
+	"RWD":0,
+	"Retail Price":84165,
+	"Dealer Cost":72206,
+	"Engine Size (l)":3.6,
+	"Cyl":6,
+	"HP":315,
+	"City MPG":17,
+	"Hwy MPG":24,
+	"Weight":3240,
+	"Wheel Base":93,
+	"Len":175,
+	"Width":72
+	},
+	{
+	"Vehicle Name":"Porsche 911 Carrera convertible 2dr (coupe)",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":79165,
+	"Dealer Cost":69229,
+	"Engine Size (l)":3.6,
+	"Cyl":6,
+	"HP":315,
+	"City MPG":18,
+	"Hwy MPG":26,
+	"Weight":3135,
+	"Wheel Base":93,
+	"Len":175,
+	"Width":70
+	},
+	{
+	"Vehicle Name":"Mercedes-Benz SL600 convertible 2dr",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":126670,
+	"Dealer Cost":117854,
+	"Engine Size (l)":5.5,
+	"Cyl":12,
+	"HP":493,
+	"City MPG":13,
+	"Hwy MPG":19,
+	"Weight":4429,
+	"Wheel Base":101,
+	"Len":179,
+	"Width":72
+	},
+	{
+	"Vehicle Name":"Mercedes-Benz SLK230 convertible 2dr",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":40320,
+	"Dealer Cost":37548,
+	"Engine Size (l)":2.3,
+	"Cyl":4,
+	"HP":192,
+	"City MPG":21,
+	"Hwy MPG":29,
+	"Weight":3055,
+	"Wheel Base":95,
+	"Len":158,
+	"Width":68
+	},
+	{
+	"Vehicle Name":"Acura NSX coupe 2dr manual S",
+	"Small/Sporty/ Compact/Large Sedan":0,
+	"Sports Car":1,
+	"SUV":0,
+	"Wagon":0,
+	"Minivan":0,
+	"Pickup":0,
+	"AWD":0,
+	"RWD":1,
+	"Retail Price":89765,
+	"Dealer Cost":79978,
+	"Engine Size (l)":3.2,
+	"Cyl":6,
+	"HP":290,
+	"City MPG":17,
+	"Hwy MPG":24,
+	"Weight":3153,
+	"Wheel Base":100,
+	"Len":174,
+	"Width":71
+	}
+];
+</script>
+
+<div id="bar1"></div>
+
+<script>
+
+var l_data_to_display = [];
+for (i=0; i< data_from_json.length; i++) {
+	l_data_to_display[i] = data_from_json[i]["HP"];
+}
+var l_labels = [];
+for (i=0; i< data_from_json.length; i++) {
+	l_labels[i] = data_from_json[i]["Vehicle Name"];
+}
+
+// Declare namespace
+d3.cloudshapes = {};
+
+// Declare component: (this outer function acts as the closure):
+d3.cloudshapes.barChart = function module() {
+    var margin = {top: 20, right: 20, bottom: 40, left: 40},
+        width = 500,
+        height = 500,
+        gap = 0,
+        ease = "bounce";
+    var svg;
+
+
+    // Define the 'inner' function: which, through the surreal nature of JavaScript scoping, can access
+    // the above variables. 
+    function exports(_selection) {
+        _selection.each(function(_data) {
+            var chartW = width - margin.left - margin.right,
+                chartH = height - margin.top - margin.bottom;
+
+	    // Define x and y scale variables.
+            var x1 = d3.scale.ordinal()
+                    .domain(_data.map(function(d, i) { return i; }))
+                    .rangeRoundBands([0, chartW], 0.1);
+
+            var y1 = d3.scale.linear()
+                    .domain([0, d3.max(_data, function(d, i) { return d; })])
+                    .range([chartH, 0]);
+
+
+
+	    // If no SVG exists, create one - and add key groups:
+            if (!svg) {
+                svg = d3.select(this)
+                    .append("svg").attr("width", 600).attr("height", 600)
+                    .classed("chart", true);
+                var container = svg.append("g").classed("container-group", true);
+                container.append("g").classed("chart-group", true);
+
+                //define axis
+                var axisScale = d3.scale.linear()
+                var x0 = d3.scale.ordinal()
+					.rangeRoundBands([0, width], .1);
+				var x1 = d3.scale.ordinal();
+				var xAxis = d3.svg.axis()
+				    .scale(x0)
+				    .orient("bottom");
+				x0.domain(l_labels);
+				x1.domain(l_labels).rangeRoundBands([0, x0.rangeBand()]);
+            }
+
+	    // Transition the width and height of the main SVG and the key 'g' group: 
+            svg.transition().attr({width: width, height: height});
+            svg.select(".container-group")
+                .attr({transform: "translate(" + margin.left + "," + margin.top + ")"});
+
+	    // Define gap between bars: 
+            var gapSize = x1.rangeBand() / 100 * gap;
+
+	    // Define width of each bar: 
+            var barW = x1.rangeBand() - gapSize;
+
+            // Select all bars and bind data:  
+            var bars = svg.select(".chart-group")
+                    .selectAll(".bar")
+                    .data(_data);
+
+
+	    // ENTER, UPDATE and EXIT CODE: 
+	    // D3 ENTER code for bars!
+            bars.enter().append("rect")
+                .classed("bar", true)
+                .attr({x: chartW,
+                    width: barW,
+                    y: function(d, i) { return y1(d); },
+                    height: function(d, i) { return chartH - y1(d); }
+                })
+
+	    // D3 UPDATE code for bars 
+            bars.transition()
+                .ease(ease)
+                .attr({
+                    width: barW,
+                    x: function(d, i) { return x1(i) + gapSize / 2; },
+                    y: function(d, i) { return y1(d); },
+                    height: function(d, i) { return chartH - y1(d); }
+                });
+
+	    // D3 EXIT code for bars
+            bars.exit().transition().style({opacity: 0}).remove();
+        });
+    }
+
+
+    // GETTERS AND SETTERS: 
+    exports.width = function(_x) {
+        if (!arguments.length) return width;
+        width = parseInt(_x);
+        return this;
+    };
+    exports.height = function(_x) {
+        if (!arguments.length) return height;
+        height = parseInt(_x);
+        return this;
+    };
+    exports.gap = function(_x) {
+        if (!arguments.length) return gap;
+        gap = _x;
+        return this;
+    };
+    exports.ease = function(_x) {
+        if (!arguments.length) return ease;
+        ease = _x;
+        return this;
+    };
+
+    return exports;
+};
+
+// Usage
+/////////////////////////////////
+
+
+// Create two instances of our chart components:
+var chart1 = d3.cloudshapes.barChart();
+// Function used to create a nice random data-set:
+function randomDataset() {
+    return d3.range(~~(Math.random() * 50)).map(function(d, i) {
+        return ~~(Math.random() * 1000);
+    });
+}
+// Select the div's, and call, i.e. actually initialise each chart:
+var data1 = randomDataset();
+d3.select("#bar1")
+	.datum(l_data_to_display)
+	.call(chart1);
+
+// //axis
+// var axisScale = d3.scale.linear()
+//     .domain([0, 100])
+//     .range([0, 400]);
+// var xAxis = d3.svg.axis()
+// 	.scale(axisScale);
+// var xAxisGroup = chart1.append("g")
+// 	.call(xAxis);
+
+
+
+</script>
+
+
+
+
+
+</body>
+</html>

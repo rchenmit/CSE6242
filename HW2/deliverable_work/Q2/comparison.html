@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html charset="utf-8">
+
+<head>
+	<title>Viz - Comparison</title>
+	<script src="d3/d3.min.js"></script>
+    <script type="text/javascript" src="http://d3js.org/queue.v1.min.js"> </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+</head>
+<body>
+	<h1>HW2 Q2.4 - Viz of Comparison</h1>
+	<br>
+	Here we're going to see a visualization that compares <strong>Retail Price, Engine Size, HP, City MPG and Hwy MPG</strong>.<br>
+	<hr>
+	<h1> Retail Price </h1>
+	<script>
+	function average(arr_numbers) {
+		var total = 0;
+		for (var i=0; i< arr_numbers.length; i++) {
+			total = total + arr_numbers[i];
+		}
+		avg = total / arr_numbers.length;
+		return avg;
+	}
+	</script>
+
+
+	<script>
+	//for the viz
+	var color = d3.scale.category20();
+	var width = 850,
+		height=750;
+
+	var canvas = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+			.attr("transform", "translate(50,50)");
+	var pack = d3.layout.pack()
+		.size([width, height - 50])
+		.padding(10);
+
+
+	d3.json("retailprice.json", function (data) {
+		var nodes = pack.nodes(data);
+		var node = canvas.selectAll(".node")
+			.data(nodes)
+			.enter()
+			.append("g")
+				.attr("class", "node")
+				.attr("transform", function (d) {return "translate(" + d.x + "," + d.y + ")"; });
+		node.append("circle")
+			.attr("r", function(d){ return d.r;})
+//			.attr("fill", "steelblue")
+			.attr("fill", function(d){ return color(d.name);})
+			.attr("opacity", 1)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1");
+
+		node.append("text")
+			.text(function(d) { return d.children ? "" : d.name; })
+			.attr("font-size", "18px");
+//			.attr("transform", "translate(50,50)");
+		node.append("text")
+			.text(function(d) {return d.children ? "" : "$" + parseInt(d.value)})
+			.attr("transform", "translate(0, 25)");
+	});
+	</script>
+
+	<hr>
+	<h1> Engine Size </h1>
+	<script>
+	//for the viz
+	var color = d3.scale.category20();
+	var width = 850,
+		height=750;
+
+	var canvas1 = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+			.attr("transform", "translate(50,50)");
+	var pack1 = d3.layout.pack()
+		.size([width, height - 50])
+		.padding(10);
+
+
+	d3.json("enginesize.json", function (data) {
+		var nodes = pack1.nodes(data);
+		var node = canvas1.selectAll(".node")
+			.data(nodes)
+			.enter()
+			.append("g")
+				.attr("class", "node")
+				.attr("transform", function (d) {return "translate(" + d.x + "," + d.y + ")"; });
+		node.append("circle")
+			.attr("r", function(d){ return d.r;})
+//			.attr("fill", "steelblue")
+			.attr("fill", function(d){ return color(d.name);})
+			.attr("opacity", 1)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1");
+
+		node.append("text")
+			.text(function(d) { return d.children ? "" : d.name; });
+//			.attr("transform", "translate(50,50)");
+		node.append("text")
+		.text(function(d) {return d.children ? "" : d.value.toFixed(1) + "L"})
+		.attr("transform", "translate(0, 25)");
+	});
+	</script>
+
+	<hr>
+	<h1> Horsepower </h1>
+	<script>
+	//for the viz
+	var color = d3.scale.category20();
+	var width = 850,
+		height=750;
+
+	var canvas2 = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+			.attr("transform", "translate(50,50)");
+	var pack2 = d3.layout.pack()
+		.size([width, height - 50])
+		.padding(10);
+
+
+	d3.json("hp.json", function (data) {
+		var nodes = pack2.nodes(data);
+		var node = canvas2.selectAll(".node")
+			.data(nodes)
+			.enter()
+			.append("g")
+				.attr("class", "node")
+				.attr("transform", function (d) {return "translate(" + d.x + "," + d.y + ")"; });
+		node.append("circle")
+			.attr("r", function(d){ return d.r;})
+//			.attr("fill", "steelblue")
+			.attr("fill", function(d){ return color(d.name);})
+			.attr("opacity", 1)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1");
+
+		node.append("text")
+			.text(function(d) { return d.children ? "" : d.name; });
+//			.attr("transform", "translate(50,50)");
+		node.append("text")
+		.text(function(d) {return d.children ? "" : d.value.toFixed(0)})
+		.attr("transform", "translate(0, 25)");
+	});
+	</script>
+
+	<hr>
+	<h1> City MPG </h1>
+	<script>
+	//for the viz
+	var color = d3.scale.category20();
+	var width = 850,
+		height=750;
+
+	var canvas3 = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+			.attr("transform", "translate(50,50)");
+	var pack3 = d3.layout.pack()
+		.size([width, height - 50])
+		.padding(10);
+
+
+	d3.json("citympg.json", function (data) {
+		var nodes = pack3.nodes(data);
+		var node = canvas3.selectAll(".node")
+			.data(nodes)
+			.enter()
+			.append("g")
+				.attr("class", "node")
+				.attr("transform", function (d) {return "translate(" + d.x + "," + d.y + ")"; });
+		node.append("circle")
+			.attr("r", function(d){ return d.r;})
+//			.attr("fill", "steelblue")
+			.attr("fill", function(d){ return color(d.name);})
+			.attr("opacity", 1)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1");
+
+		node.append("text")
+			.text(function(d) { return d.children ? "" : d.name; });
+//			.attr("transform", "translate(50,50)");
+		node.append("text")
+		.text(function(d) {return d.children ? "" : d.value.toFixed(0) + " MPG"})
+		.attr("transform", "translate(0, 25)");
+	});
+	</script>
+
+	<hr>
+	<h1> Hwy MPG </h1>
+
+
+	<script>
+	//for the viz
+	var color = d3.scale.category20();
+	var width = 850,
+		height=750;
+
+	var canvas4 = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+			.attr("transform", "translate(50,50)");
+	var pack4 = d3.layout.pack()
+		.size([width, height - 50])
+		.padding(10);
+
+
+	d3.json("hwympg.json", function (data) {
+		var nodes = pack4.nodes(data);
+		var node = canvas4.selectAll(".node")
+			.data(nodes)
+			.enter()
+			.append("g")
+				.attr("class", "node")
+				.attr("transform", function (d) {return "translate(" + d.x + "," + d.y + ")"; });
+		node.append("circle")
+			.attr("r", function(d){ return d.r;})
+//			.attr("fill", "steelblue")
+			.attr("fill", function(d){ return color(d.name);})
+			.attr("opacity", 1)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1");
+
+		node.append("text")
+			.text(function(d) { return d.children ? "" : d.name; });
+//			.attr("transform", "translate(50,50)");
+		node.append("text")
+		.text(function(d) {return d.children ? "" : d.value.toFixed(0) + " MPG"})
+		.attr("transform", "translate(0, 25)");
+	});
+	</script>
+
+	<script>
+	////THIS WAS USED TO GENERATE THE JSON files for the above visualizations
+	//var json_file;
+	// $.ajax({
+	// 	type: "GET",
+	// 	url:'cars.json',
+	// 	dataType: "json",
+	// 	success: function (response) {
+	// 		var manufacturers_to_analyze = ["Porsche","Audi","Acura","Mercedes-Benz" ];
+	// 		var manufacturers_children_index = {"Porsche": 0, "Audi": 1, "Acura": 2, "Mercedes-Benz":3};
+
+
+	// 		var l_car_nodes = [];
+	// 		var l_cars = response;
+	// 		var tree_cars = {"name": "Cars", "value":100, "children": []};
+
+	// 		for (var i=0; i< manufacturers_to_analyze.length; i++) {
+	// 			tree_cars["children"][tree_cars["children"].length] = {"name": manufacturers_to_analyze[i], "value":75, "children":[]};
+	// 		}
+
+	// 		for (var i=0; i < l_cars.length; i++) {
+	// 			var this_car = l_cars[i];
+	// 			var carname = this_car["Vehicle Name"];
+	// 			carname_split = carname.split(' ');
+	// 			var manufacturer = carname_split[0];
+	// 			this_car["value"] = 25;
+	// 			this_car["name"] = carname_split.slice(1,carname_split.length).join(' ');
+	// 			if (manufacturers_to_analyze.indexOf(manufacturer) != -1) {
+	// 				tree_cars["children"][manufacturers_children_index[manufacturer]]["children"][tree_cars["children"][manufacturers_children_index[manufacturer]]["children"].length] = l_cars[i];
+
+	// 			}
+	// 		}
+	// 		//$(document.body).append(JSON.stringify(tree_cars));
+
+
+	// 		var attributes_to_analyze = ["Retail Price", "Engine Size (l)", "HP", "City MPG", "Hwy MPG"];
+	// 		var attribute_children_index = {"Retail Price":0, "Engine Size (l)":1, "HP":2, "City MPG":3, "Hwy MPG":4};
+
+	// 		var tree_properties = {"name": "Attributes", "value":100, "children": []};
+			
+	// 		for (var i = 0; i< attributes_to_analyze.length; i++) {
+	// 			tree_properties["children"][tree_properties["children"].length] = {"name": attributes_to_analyze[i], "value":75, "children":[]};
+	// 		}
+
+
+	// 		for (var i =0; i <attributes_to_analyze.length; i++) {
+	// 			var attribute = attributes_to_analyze[i];
+
+	// 			var this_attribute_index = attribute_children_index[attribute];
+	// 			for (var k =0; k < manufacturers_to_analyze.length; k++) {
+	// 				var manufacturer = 	manufacturers_to_analyze[k];
+	// 				var l_this_attribute_this_manufacturer = [];
+	// 				for (var j = 0; j< tree_cars["children"][manufacturers_children_index[manufacturer]]["children"].length; j++){
+	// 					l_this_attribute_this_manufacturer[l_this_attribute_this_manufacturer.length] = Number(tree_cars["children"][manufacturers_children_index[manufacturer]]["children"][j][attribute]);
+	// 				}
+	// 				var avg_this_manufacturer = average(l_this_attribute_this_manufacturer);
+					
+	// 				tree_properties["children"][this_attribute_index]["children"][tree_properties["children"][this_attribute_index]["children"].length] = {"name": manufacturer, "value":avg_this_manufacturer};
+	// 			}
+	// 		}
+	// 		$(document.body).append(JSON.stringify(tree_properties));
+
+	// 	}
+	// });
+	</script>
+
+
+</body>
+</html>

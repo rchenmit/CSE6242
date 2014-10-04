@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<html lang="en">
+<html>
+  <head>
+    <script type="text/javascript" src="d3/d3.v3.min.js"> </script>
+    <script type="text/javascript" src="d3/d3-tip.js"></script>
+    <script type="text/javascript" src="d3/queue.v1.min.js"></script>
+    <style>
+        .d3-tip {
+          line-height: 1;
+          font-weight: bold;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          border-radius: 2px;
+        }
+
+
+        .d3-tip.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+    var h = 1000, w = 1500;
+    var color = d3.scale.category20();
+    var svg = d3.select("body")
+                    .append("svg")
+                    .attr("height",h)
+                    .attr("width",w);
+
+
+
+    var tip = d3.tip().html(function(d) { 
+        return "name: " + d.name + " ; coolness: " + d.coolness;
+        
+    });
+    var tip25 = d3.tip().html(function(d) { 
+        return "coolness: " + d.coolness;
+        
+    });
+
+    svg.call(tip)
+    svg.call(tip25)
+
+
+queue()
+
+    .defer(d3.json, "miserables.json")
+    .await(drawViz); 
+function drawViz(error, miserables, table) {
+   var textlabels = svg.selectAll("text")
+                    .data(miserables.nodes)//
+                    .enter()
+                    .append("text")
+                    .attr("fill", "blue")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "14px")
+                    .attr("orient", "right")
+                    .text(function(d) { if (d.coolness > 25){return d.name} ; }); //change for coolness > 25
+    var force = d3.layout.force()
+                    .nodes(miserables.nodes)//
+                    .links(miserables.links)//
+                    .size([w,h])
+                    .linkDistance([100]) // chagned from 250 to 100
+                    .charge([-1500])
+                    .gravity(0.3)
+                    .start();
+    var edges = svg.selectAll("line")
+                    .data(miserables.links)//
+                    .enter()
+                    .append("line")
+                    .style("stroke", "#ccc")
+                    .style("stroke-width", 1)
+                    .attr("marker-end", "url(#end)");
+
+    var nodes = svg.selectAll("circle")
+                    .data(miserables.nodes)
+                    .enter()
+                    .append("circle")
+                    .attr("r", function(d){return d.coolness/5})
+                    .attr("opacity", 0.5)
+                    .style("fill", function(d) { return color(d.group); })
+                    .on("dblclick", function(d)
+                        {
+                            if(d.fixed==true)
+                            {
+                                d.fixed=false;
+                                d3.select(this).style( "fill", function(d) { return color(d.group); });
+                            }
+                            else{
+                                d.fixed=true
+                               d3.select(this).style( "fill", "red");
+
+                            }
+                        })
+
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide)
+                    .call(force.drag);
+
+
+    force.on("tick", function() {
+               edges.attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+               nodes.attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; })
+               textlabels.attr("transform", function(d) {
+                        return "translate(" + d.x + "," + d.y + ")";
+                        });
+               }); 
+
+}; 
+</script>
+</body>
+</html>

@@ -87,17 +87,18 @@ def createWebServiceSession(api_key, token, api_sig):
 
 
 def url_fix(s, charset='utf-8'):
-    """Sometimes you get an URL by a user that just isn't a real
-    URL because it contains unsafe characters like ' ' and so on.  This
-    function can fix some of the problems in a similar way browsers
-    handle data entered by the user:
+    # '''
+    # Sometimes you get an URL by a user that just isn't a real
+    # URL because it contains unsafe characters like ' ' and so on.  This
+    # function can fix some of the problems in a similar way browsers
+    # handle data entered by the user:
+    # 
+    # >>> url_fix(u'http://de.wikipedia.org/wiki/Elf (Begriffsklarung)')
+    # 'http://de.wikipedia.org/wiki/Elf%20%28Begriffskl%C3%A4rung%29'
 
-    >>> url_fix(u'http://de.wikipedia.org/wiki/Elf (Begriffsklärung)')
-    'http://de.wikipedia.org/wiki/Elf%20%28Begriffskl%C3%A4rung%29'
-
-    :param charset: The target charset for the URL if the url was
-                    given as unicode string.
-    """
+    # :param charset: The target charset for the URL if the url was
+    #                 given as unicode string.
+    # '''
     if isinstance(s, unicode):
         s = s.encode(charset, 'ignore')
     scheme, netloc, path, qs, anchor = urlparse.urlsplit(s)
@@ -105,7 +106,7 @@ def url_fix(s, charset='utf-8'):
     qs = urllib.quote_plus(qs, ':&=')
     return urlparse.urlunsplit((scheme, netloc, path, qs, anchor))
 
-def getSimilarTracks(artist, songtitle, api_key, mbid=None, autocorrect=None, limit=None):
+def getSimilarTracks(api_key, artist=None, songtitle=None, mbid=None, autocorrect=None, limit=None):
 	'''
 	get similar songs to the songe name "songtitle" by artiest "artist"
 	'''
@@ -113,12 +114,17 @@ def getSimilarTracks(artist, songtitle, api_key, mbid=None, autocorrect=None, li
 	request_url = ''.join([API_ROOT_ADDRESS,
 						  "?method=", "track.getSimilar", 
 						  "&api_key=", api_key,
-						  "&artist=", artist,
-						  "&track=", songtitle,
 						  "&format=json"
 						  ])
 	if mbid:
 		request_url = request_url + "&mbid=" + str(mbid)
+	elif (not artist and not songtitle):
+		return {'similartracks': 'NA'}
+	else:
+		request_url = request_url + "&artist=" + artist
+		request_url = request_url + "&track=" + songtitle
+
+
 	if autocorrect and autocorrect==0 or autocorrect==1:
 		request_url = request_url + "&autocorrect=" + str(autocorrect)
 	if limit and type(limit)==int:
@@ -127,7 +133,10 @@ def getSimilarTracks(artist, songtitle, api_key, mbid=None, autocorrect=None, li
 	print "HTTP GET: " + request_url
 	response = urllib2.urlopen(request_url, timeout=200)
 	response_json = response.read()
-	response_dict = json.loads(response_json)
+	try:
+		response_dict = json.loads(response_json)
+	except:
+		return {'similartracks': 'NA'}
 	return response_dict
 
 def removeTracksWithMissingMbid(nparr_tracks):
@@ -162,7 +171,7 @@ print "* this script pulls from last.fm 100 similar tracks to what is specified"
 ### authentification
 # fetch authetification request token
 print "* fetching authentification request token with api_key and api_signature:  " 
-auth_token = fetchRequestToken(API_KEY, API_SIG)[1]["token"]
+auth_token = fetchRequestToken(API_KEY, API_SECRET)[1]["token"]
 #+ fetchRequestToken(API_KEY, API_SIG)[0]
 
 # request authorization from user, using HTTP GET request
@@ -182,7 +191,7 @@ print "** authentification done ***********************************"
 ### crawl
 print "* getting similar tracks to the song: artist = {0}, track = {1}".format("cher", "believe")
 #get a dictionary of the similar tracks
-d_getSimilarTracks_origArtist = getSimilarTracks(ORIG_ARTIST_NAME, ORIG_SONG_NAME, API_KEY, mbid=None, autocorrect=None, limit=100)
+d_getSimilarTracks_origArtist = getSimilarTracks(API_KEY, artist=ORIG_ARTIST_NAME, songtitle=ORIG_SONG_NAME, mbid=None, autocorrect=None, limit=100)
 
 ### parse the dictionary of similar tracks
 
@@ -197,12 +206,16 @@ for track in nparr_similartracks_origArtist:
 	this_artist = track['artist']['name']
 	this_track_name = track['name']
 	this_mbid = track['mbid']
-	d_getSimilarTracks_thisTrack = getSimilarTracks(this_artist,this_track_name, API_KEY, limit=10) #use API to get similar tracks to this track
+	d_getSimilarTracks_thisTrack = getSimilarTracks(API_KEY, artist=this_artist,songtitle=this_track_name, mbid=this_mbid, limit=10) #use API to get similar tracks to this track
 	
-	if type(d_getSimilarTracks_thisTrack['similartracks']['track']) == list: 
-		nparr_similarTracks_thisTrack = np.array(d_getSimilarTracks_thisTrack['similartracks']['track'])
-	elif type(d_getSimilarTracks_thisTrack['similartracks']['track']) == dict:
-		nparr_similarTracks_thisTrack = nparr(d_getSimilarTracks_thisTrack['similartracks'])
+	if 'similartracks' in d_getSimilarTracks_thisTrack:
+		if 'track' in d_getSimilarTracks_thisTrack['similartracks']:
+			if type(d_getSimilarTracks_thisTrack['similartracks']['track']) == list: 
+				nparr_similarTracks_thisTrack = np.array(d_getSimilarTracks_thisTrack['similartracks']['track'])
+			elif type(d_getSimilarTracks_thisTrack['similartracks']['track']) == dict:
+				nparr_similarTracks_thisTrack = nparr(d_getSimilarTracks_thisTrack['similartracks'])
+			else:
+				continue
 	else:
 		continue
 	nparr_similarTracks_thisTrack = removeTracksWithMissingMbid(nparr_similarTracks_thisTrack)
@@ -239,6 +252,16 @@ for t_track_listOfSimilars in t_10mostSimilarTracks_toOriginalSimilars:
 		l_similar_mbid.append(mbid_in_sim_list)
 od_trackId_similarTrackId = collections.OrderedDict((('source', l_orig_mbid), ('target', l_similar_mbid)))
 df_trackId_similarTrackId = pd.DataFrame.from_dict(od_trackId_similarTrackId)
+
+#remove duplicates
+lt_trackId_similarTrackId_GROUPED = df_trackId_similarTrackId.groupby(['source', 'target']).groups.keys()
+lt_source_target_sorted = []
+for tup in lt_trackId_similarTrackId_GROUPED:
+	lt_source_target_sorted.append(tuple(np.sort(tup)))
+nparry_source_target_sorted_NO_DUPLICATES = np.unique(lt_source_target_sorted)
+df_trackId_similarTrackId_NO_DUPLICATES = pd.DataFrame(data = nparry_source_target_sorted_NO_DUPLICATES, columns = ['source','target'])
+
+#save files
 df_trackId_similarTrackId.to_csv("track_id_sim_track_id.csv", encoding='utf-8', index= False)
 
 
